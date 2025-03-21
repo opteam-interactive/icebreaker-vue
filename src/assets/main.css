@@ -1,0 +1,19 @@
+@import "tailwindcss";
+@plugin "daisyui";
+@plugin "daisyui" {
+  themes: light --default, dark --prefersdark, aqua ;
+}
+
+/* @plugin "tailwindcss-animate"; */
+
+
+
+@theme {  
+  --color-primary: oklch(23.25% 0.1322 263.91);
+  --color-lightblue: oklch(73.2% 0.1294 215.17);
+  --color-dark : oklch(19% 0.1039 263.68);
+}
+
+.gradient {
+  background-image: linear-gradient(to left top, #000a40, #000c45, #000d49, #000e4e, #000e53, #011d64, #002c74, #003b85, #005ba2, #007cba, #009ccc, #00bcdb);
+}
