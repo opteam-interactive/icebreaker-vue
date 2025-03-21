@@ -3,7 +3,11 @@
 @plugin "daisyui" {
   themes: light --default, dark --prefersdark, aqua ;
 }
+@plugin "daisyui/theme" {
+  name: "aqua";
+  --color-base-content: #fff;
 
+}
 /* @plugin "tailwindcss-animate"; */
 
 
@@ -16,4 +20,14 @@
 
 .gradient {
   background-image: linear-gradient(to left top, #000a40, #000c45, #000d49, #000e4e, #000e53, #011d64, #002c74, #003b85, #005ba2, #007cba, #009ccc, #00bcdb);
+}
+
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
 }

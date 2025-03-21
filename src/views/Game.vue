@@ -1,12 +1,10 @@
 <script setup lang="ts">
-import { ref, onUnmounted, onMounted } from "vue";
+import { ref, onUnmounted, onMounted, onUpdated } from "vue";
 import { fetchQuestions, fetchParticipants } from "@/lib/game";
 import { useRouter, } from "vue-router";
 import logo_LHBA from "@/assets/images/logo_LHBA.svg";
 import logo_opteam from "@/assets/images/logo_opteam.png";
-import { Undo2 } from "lucide-vue-next";
-const router = useRouter();
-
+import { Undo2, ArrowBigRightDash } from "lucide-vue-next";
 
 interface Game {
     participants: string[];
@@ -16,7 +14,6 @@ interface Game {
     questions: string[];
     intervalId: any
 }
-
 
 const game = ref<Game>({
     participants: [],
@@ -32,6 +29,8 @@ const loading = ref(true);
 onMounted(() => {
     initializeGame();
 })
+
+const router = useRouter();
 
 const initializeGame = async () => {
     // Use the functions to fetch participants and questions
@@ -49,61 +48,54 @@ const initializeGame = async () => {
         game.value.currentQuestion = shuffledQuestions[0];
     }
     loading.value = false;
+    startTimer();
 };
 
+// Function to start the timer
+const startTimer = () => {
+    console.log('Starting timer...');
+
+    if (game.value.intervalId) {
+        clearInterval(game.value.intervalId);
+    }
+
+    const duration = 60;
+    game.value.countDown = duration;
+
+    game.value.intervalId = setInterval(() => {
+        if (game.value.countDown > 0) {
+            game.value.countDown--;
+        } else {
+            clearInterval(game.value.intervalId);
+            game.value.intervalId = null;
+        }
+    }, 1000);
+};
 // Function to handle next question
 const nextQuestion = () => {
 
     //If questions finished, restart the questions
     const nextIndex = game.value.questions.indexOf(game.value.currentQuestion) + 1 === game.value.questions.length ? 0 : game.value.questions.indexOf(game.value.currentQuestion) + 1;
     game.value.currentQuestion = game.value.questions[nextIndex]
+
     startTimer();
 
-
-    //Redirect home when over
+    // If last participant, go home
     if (game.value.participants.indexOf(game.value.currentName) + 1 === game.value.participants.length) {
         console.log("Game over");
-        router.push("/register");
-    }
-    else {
+        router.push("/registration");
+    } else {
         const nextNameIndex = game.value.participants.indexOf(game.value.currentName) + 1;
         game.value.currentName = game.value.participants[nextNameIndex];
     }
 
 }
-
-// Function to start the timer
-const startTimer = () => {
-    console.log('Starting timer...');
-
-    let countdownIntervalId: number | null = null;
-
-    if (countdownIntervalId) {
-        clearInterval(countdownIntervalId);
-        countdownIntervalId = null;
+onUnmounted(() => {
+    if (game.value.intervalId) {
+        clearInterval(game.value.intervalId);
     }
+});
 
-    const duration = 60;
-    game.value.countDown = duration;
-
-    countdownIntervalId = setInterval(() => {
-        if (game.value.countDown <= 1) {
-            if (countdownIntervalId) {
-                clearInterval(countdownIntervalId);
-                countdownIntervalId = null;
-            }
-            game.value.countDown = 0;
-        } else {
-            game.value.countDown--;
-        }
-    }, 1000);
-
-    onUnmounted(() => {
-        if (countdownIntervalId) {
-            clearInterval(countdownIntervalId);
-        }
-    });
-};
 
 </script>
 
@@ -112,13 +104,22 @@ const startTimer = () => {
         <p class="text-xl">Loading...</p>
     </div>
     <div v-else class="flex flex-col items-center h-full justify-center md:gap-16 relative text-center p-16 grow">
-        <div class="flex justify-end w-full absolute top-0"><a class="btn btn-ghost" href="/registration">Retour aux participants <Undo2/></a></div>
-       
+        <div class="flex justify-end w-full absolute top-0"><a class="btn btn-ghost" href="/registration">Retour aux
+                participants
+                <Undo2 />
+            </a></div>
+
         <div class="flex flex-col items-center gap-16 max-w-3/4 z-10">
-            <h1 class="text-6xl underline decoration-secondary col-start-2">{{game.currentName}}</h1>
-            <h2 class="text-5xl  leading-16">{{game.currentQuestion}}</h2>
-            <button class="text-2xl border border-secondary rounded-full px-16 py-2 hover:bg-secondary cursor-pointer"
-                @click="nextQuestion"><span>{{ game.countDown }}</span><span>0</span></button>
+            <h1 class="text-6xl underline decoration-lightblue col-start-2">{{ game.currentName }}</h1>
+            <h2 class="text-5xl  leading-16">{{ game.currentQuestion }}</h2>
+
+            <Transition mode="out-in">
+                <button v-if="game.countDown > 0" class="text-3xl btn btn-primary btn-outline w-1/4 rounded-full  "
+                    @click="nextQuestion">{{ game.countDown }}</button>
+                <button v-else class="btn rounded-full btn-primary w-1/4" @click="nextQuestion">Question suivante
+                    <ArrowBigRightDash />
+                </button>
+            </Transition>
 
 
         </div>

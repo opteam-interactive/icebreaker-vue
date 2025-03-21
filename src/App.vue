@@ -6,7 +6,10 @@ import { RouterLink, RouterView } from 'vue-router'
   <div class="min-h-screen flex flex-col p-4">
     <header></header>
     <main class="flex flex-col grow border-2 border-lightblue rounded-xl p-4 gradient">
+      <Suspense>
       <RouterView  />
+    </Suspense>
+
     </main>
     <footer></footer>
   </div>

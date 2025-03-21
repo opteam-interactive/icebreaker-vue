@@ -1,0 +1,5 @@
+- sound
+- animation
+- timer adjust
+- list of quiz
+- 
